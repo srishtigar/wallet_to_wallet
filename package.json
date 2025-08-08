@@ -1,0 +1,29 @@
+{
+  "name": "simple-hedera-wallet",
+  "version": "1.0.0",
+  "description": "A minimal Hedera Hashgraph wallet for academic purposes",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "hedera",
+    "hashgraph",
+    "blockchain",
+    "wallet",
+    "academic"
+  ],
+  "author": "Academic Project",
+  "license": "MIT",
+  "dependencies": {
+    "@hashgraph/sdk": "^2.40.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
+

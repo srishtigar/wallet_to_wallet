@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Hedera Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f9fafb;
+        }
+
+        .section h2 {
+            color: #374151;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input[type="text"], input[type="number"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        .result.success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        .result.error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .network-info {
+            background: #eff6ff;
+            border: 2px solid #3b82f6;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Simple Hedera Wallet</h1>
+            <p>Academic Blockchain Project - Hedera Hashgraph Integration</p>
+        </div>
+
+        <div class="content">
+            <div class="network-info" id="networkInfo">
+                <strong>Loading network information...</strong>
+            </div>
+
+            <!-- Balance Check Section -->
+            <div class="section">
+                <h2>💰 Check Account Balance</h2>
+                <div class="form-group">
+                    <label for="balanceAccountId">Hedera Account ID:</label>
+                    <input type="text" id="balanceAccountId" placeholder="0.0.123456" />
+                </div>
+                <button class="btn" onclick="checkBalance()">Check Balance</button>
+                <div class="loading" id="balanceLoading">Checking balance...</div>
+                <div class="result" id="balanceResult"></div>
+            </div>
+
+            <!-- Transfer Section -->
+            <div class="section">
+                <h2>💸 Transfer HBAR</h2>
+                <div class="form-group">
+                    <label for="fromAccountId">From Account ID:</label>
+                    <input type="text" id="fromAccountId" placeholder="0.0.123456" />
+                </div>
+                <div class="form-group">
+                    <label for="privateKey">Private Key:</label>
+                    <input type="password" id="privateKey" placeholder="Your private key" />
+                </div>
+                <div class="form-group">
+                    <label for="toAccountId">To Account ID:</label>
+                    <input type="text" id="toAccountId" placeholder="0.0.654321" />
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount (HBAR):</label>
+                    <input type="number" id="amount" placeholder="1.0" step="0.01" min="0" />
+                </div>
+                <button class="btn" onclick="transferHbar()">Transfer HBAR</button>
+                <div class="loading" id="transferLoading">Processing transfer...</div>
+                <div class="result" id="transferResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load network information on page load
+        window.onload = function() {
+            loadNetworkInfo();
+        };
+
+        async function loadNetworkInfo() {
+            try {
+                const response = await fetch('/api/network');
+                const data = await response.json();
+                
+                document.getElementById('networkInfo').innerHTML = `
+                    <strong>Network:</strong> ${data.network.toUpperCase()} | 
+                    <strong>Status:</strong> ${data.status} | 
+                    <strong>Time:</strong> ${new Date(data.timestamp).toLocaleString()}
+                `;
+            } catch (error) {
+                document.getElementById('networkInfo').innerHTML = `
+                    <strong style="color: #dc2626;">Error loading network info: ${error.message}</strong>
+                `;
+            }
+        }
+
+        async function checkBalance() {
+            const accountId = document.getElementById('balanceAccountId').value.trim();
+            const resultDiv = document.getElementById('balanceResult');
+            const loadingDiv = document.getElementById('balanceLoading');
+
+            if (!accountId) {
+                showResult('balanceResult', 'Please enter an account ID', 'error');
+                return;
+            }
+
+            // Show loading
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/balance/${accountId}`);
+                const data = await response.json();
+
+                loadingDiv.style.display = 'none';
+
+                if (response.ok) {
+                    const resultText = `✅ Balance Query Successful
+
+Account ID: ${data.accountId}
+HBAR Balance: ${data.hbarBalance}
+
+${Object.keys(data.tokens).length > 0 ? 
+    'Tokens:\n' + Object.entries(data.tokens).map(([id, amount]) => `  ${id}: ${amount}`).join('\n') : 
+    'No tokens found'}`;
+                    
+                    showResult('balanceResult', resultText, 'success');
+                } else {
+                    showResult('balanceResult', `❌ Error: ${data.error}\n${data.message || ''}`, 'error');
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                showResult('balanceResult', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function transferHbar() {
+            const fromAccountId = document.getElementById('fromAccountId').value.trim();
+            const privateKey = document.getElementById('privateKey').value.trim();
+            const toAccountId = document.getElementById('toAccountId').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const resultDiv = document.getElementById('transferResult');
+            const loadingDiv = document.getElementById('transferLoading');
+
+            if (!fromAccountId || !privateKey || !toAccountId || !amount) {
+                showResult('transferResult', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            // Show loading
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/transfer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fromAccountId,
+                        privateKey,
+                        toAccountId,
+                        amount: parseFloat(amount)
+                    })
+                });
+
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+
+                if (response.ok) {
+                    const resultText = `✅ Transfer Successful!
+
+Transaction ID: ${data.transactionId}
+Status: ${data.status}
+From: ${data.fromAccount}
+To: ${data.toAccount}
+Amount: ${data.amount}
+Time: ${new Date(data.timestamp).toLocaleString()}`;
+                    
+                    showResult('transferResult', resultText, 'success');
+                    
+                    // Clear sensitive fields
+                    document.getElementById('privateKey').value = '';
+                } else {
+                    showResult('transferResult', `❌ Transfer Failed: ${data.error}\n${data.message || ''}`, 'error');
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                showResult('transferResult', `❌ Network Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showResult(elementId, message, type) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+
+        // Clear results when input changes
+        document.getElementById('balanceAccountId').addEventListener('input', function() {
+            document.getElementById('balanceResult').style.display = 'none';
+        });
+
+        document.getElementById('fromAccountId').addEventListener('input', function() {
+            document.getElementById('transferResult').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+
