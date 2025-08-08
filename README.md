@@ -25,25 +25,23 @@ simple_hedera_wallet/
 
 1. **Install Node.js** (version 16 or higher)
 
-2. **Clone/Download** this project
-
-3. **Install dependencies:**
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-4. **Configure environment:**
+3. **Configure environment:**
    ```bash
    cp .env.example .env
    # Edit .env with your Hedera account details (optional for balance checking)
    ```
 
-5. **Start the server:**
+4. **Start the server:**
    ```bash
    npm start
    ```
 
-6. **Open browser** and go to `http://localhost:3000`
+5. **Open browser** and go to `http://localhost:3000`
 
 ## Usage
 
@@ -67,21 +65,4 @@ HEDERA_ACCOUNT_ID=0.0.your_account_id
 HEDERA_PRIVATE_KEY=your_private_key_here
 ```
 
-## Security Note
-
-This is for educational purposes. In production:
-- Never expose private keys in frontend
-- Use proper authentication
-- Implement proper error handling
-- Use HTTPS
-
-## Academic Purpose
-
-This project demonstrates:
-- Hedera Hashgraph SDK integration
-- Basic blockchain operations
-- Simple full-stack architecture
-- RESTful API design
-
-Built for learning blockchain development with minimal complexity.
 
